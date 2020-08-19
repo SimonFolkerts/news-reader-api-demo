@@ -44,3 +44,10 @@ IMPORTANT: *DON'T* put the password directly into your code. Use a .env file and
 - Paste it into your .env file as the value for ```MONGODB_URI``` (remember to make sure you've got ```.env``` listed in your ```.gitignore``` file!).
 - Change the ```<password>``` in the connection string to the password that you specified when creating the database user.
 7. Now run ```npm run dev``` on the directory and you should see ```✔ MongoDB connected```. Your application now has a database!
+
+
+#### Error Handling
+1. Add a middleware that handles errors in dev mode and one that handles errors in production
+2. The dev handler will print a stack trace to the console, the production one will not
+3. Both should set the response status to the error status if it exists, if it doesn't default to 500
+4. Both should send the error data as a json object to the client
