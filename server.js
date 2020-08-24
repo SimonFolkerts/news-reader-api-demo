@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const isProduction = process.env.MODE_ENV === "production";
+const isProduction = false;
 
 // create a new instance of the express object and store it
 const app = express();
@@ -22,6 +22,7 @@ app.use(express.json());
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 mongoose.connection.on("open", function (ref) {
   console.log("MongoDB connected");
@@ -48,26 +49,21 @@ app.use("/articles", articles);
 // any request or response errors will be handled and displayed here
 
 // development error handler
-// will print stacktrace
-if (!isProduction) {
-  app.use(function(err, req, res, next) {
+// will print stacktrace not in prod
+
+
+
+app.use((err, req, res, next) => {
+  if (!isProduction) {
     console.log(err.stack);
+  }
 
-    res.status(err.status || 500);
-
-    res.json({'errors': {
-      message: err.message,
-      error: err
-    }});
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.json({'errors': {
-    message: err.message,
-    error: {}
-  }});
+
+  res.json({
+    errors: {
+      message: err.message,
+      error: err,
+    },
+  });
 });
