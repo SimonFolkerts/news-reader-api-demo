@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const morgan = require("morgan");
+
 const isProduction = false;
 
 // create a new instance of the express object and store it
@@ -34,16 +36,20 @@ mongoose.connection.on("open", function (ref) {
 
 // ROUTING ----------------------------------------------------------------
 
+app.use(morgan('dev'));
+
 // this endpoint is if someone visits the root address (http://localhost:3000)
 app.get("/", (req, res) => {
   console.log(`${req.method} request received...`);
-  res.send("Hello");
+  res.send("Hello, welcome to the articles api!");
 });
 
 // this middleware uses the express router to handle all requests to the articles section of the api
 // the router is required into the scope and added to the middleware as the callback for that route, and all the endpoints in that particular router will handle any further url segments such as id etc
 const articles = require("./routes/articles.js");
+const users = require("./routes/users.js")
 app.use("/articles", articles);
+app.use("/users", users);
 
 // ERRORS ----------------------------------------------------------------
 // any request or response errors will be handled and displayed here
@@ -51,7 +57,11 @@ app.use("/articles", articles);
 // development error handler
 // will print stacktrace not in prod
 
-
+app.use((req, res, next) => {
+  const error = new Error("Endpoint Not Found");
+  error.status = 404;
+  next(error)
+});
 
 app.use((err, req, res, next) => {
   if (!isProduction) {
