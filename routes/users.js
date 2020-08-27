@@ -58,20 +58,61 @@ router.get("/:id/articles", (req, res, next) => {
   Article.find({ author: req.user.id })
     .sort({ createdAt: "desc" })
     .then((articles) => {
-      return res.status(200).send(articles)
-    }).catch(next);
+      return res.status(200).send(articles);
+    })
+    .catch(next);
 });
 
 router.post("/:id/articles", (req, res, next) => {
   const article = new Article(req.body);
   article.author = req.user.id;
-  article.save().then((article) => {
-    if(!req.user.articles) {
-      req.user.articles = [];
-    }
-    req.user.articles.push(article)
-    res.status(201).send(article);
-  }).catch(next);
-})
+  article
+    .save()
+    .then((article) => {
+      if (!req.user.articles) {
+        req.user.articles = [];
+      }
+      req.user.articles.push(article);
+      req.user
+        .save()
+        .then((user) => {
+          res.status(201).send({ user: user, article: article });
+        })
+        .catch(next);
+    })
+    .catch(next);
+});
+
+// Auth
+
+router.post("/register", (req, res, next) => {
+  if (!req.body.firstname) {
+    return res.status(422).send("First name can't be blank");
+  }
+  if (!req.body.lastname) {
+    return res.status(422).send("Last name can't be blank");
+  }
+  if (!req.body.username) {
+    return res.status(422).send("Username can't be blank");
+  }
+  if (!req.body.email) {
+    return res.status(422).send("Email can't be blank");
+  }
+
+  User.findOne({ email: req.body.email })
+    .then((user) => {
+      if (user) {
+        return res.status(422).send("User already exists");
+      }
+      const newUser = new User(req.body);
+      newUser
+        .save()
+        .then((result) => {
+          return res.status(201).send(result);
+        })
+        .catch(next);
+    })
+    .catch(next);
+});
 
 module.exports = router;
