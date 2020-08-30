@@ -3,7 +3,6 @@ const Article = require("../models/Article");
 
 router.param("id", (req, res, next, id) => {
   Article.findById(id)
-  .populate("author")
     .then((article) => {
       if (!article) {
         res.status(404).send("Article not found");

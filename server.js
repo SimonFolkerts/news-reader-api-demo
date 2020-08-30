@@ -36,7 +36,7 @@ mongoose.connection.on("open", function (ref) {
 
 // ROUTING ----------------------------------------------------------------
 
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // this endpoint is if someone visits the root address (http://localhost:3000)
 app.get("/", (req, res) => {
@@ -47,7 +47,7 @@ app.get("/", (req, res) => {
 // this middleware uses the express router to handle all requests to the articles section of the api
 // the router is required into the scope and added to the middleware as the callback for that route, and all the endpoints in that particular router will handle any further url segments such as id etc
 const articles = require("./routes/articles.js");
-const users = require("./routes/users.js")
+const users = require("./routes/users.js");
 app.use("/articles", articles);
 app.use("/users", users);
 
@@ -60,7 +60,7 @@ app.use("/users", users);
 app.use((req, res, next) => {
   const error = new Error("Endpoint Not Found");
   error.status = 404;
-  next(error)
+  next(error);
 });
 
 app.use((err, req, res, next) => {
@@ -70,10 +70,5 @@ app.use((err, req, res, next) => {
 
   res.status(err.status || 500);
 
-  res.json({
-    errors: {
-      message: err.message,
-      error: err,
-    },
-  });
+  res.json(err);
 });
