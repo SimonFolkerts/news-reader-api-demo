@@ -115,4 +115,18 @@ router.post("/register", (req, res, next) => {
     .catch(next);
 });
 
+router.post("/login", (req, res, next) => {
+  if (!req.body.email) {
+    return res.status(422).send("Email can't be blank");
+  }
+
+  User.findOne({ email: req.body.email }).then((user) => {
+    if (!user) {
+      return res.status(422).send("User not found");
+    } else {
+      return res.status(200).send(user);
+    }
+  });
+});
+
 module.exports = router;
