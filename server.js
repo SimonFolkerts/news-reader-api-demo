@@ -54,21 +54,25 @@ app.use("/users", users);
 // ERRORS ----------------------------------------------------------------
 // any request or response errors will be handled and displayed here
 
-// development error handler
-// will print stacktrace not in prod
-
+// if a request comes through and doesn't match any endpoints, it will continue to be passed down until it gets here. This middleware matches everything and returns 404 endpoint not found
 app.use((req, res, next) => {
   const error = new Error("Endpoint Not Found");
   error.status = 404;
   next(error);
 });
 
+// development error handler
+// will print stacktrace if not in prod
+// this middleware has 4 parameters, which tells express that it is an error handler, and it will be executed if any errors are caught. The first paramter will therefore be any error objects passed through the endpoints and middlewares
 app.use((err, req, res, next) => {
+  // the the app is not set to production mode via this flag variable, print a stacktrace in the console
   if (!isProduction) {
     console.log(err.stack);
   }
 
+  // set status to server error
   res.status(err.status || 500);
 
+  // send the error to the client
   res.json(err);
 });
